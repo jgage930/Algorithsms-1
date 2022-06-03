@@ -1,3 +1,5 @@
+
+
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
@@ -19,23 +21,23 @@ public class Percolation {
             throw new IllegalArgumentException("n must be greater than 0");
         }
         myn = n;
-        gridSize = n * n + 2;
+        gridSize = (n * n) + 2;
         grid = new boolean[gridSize]; // two spaces for the virtual tip and bottom
 
         numOpenSites = 0;
 
         // set virtual sites
         virtualTopIndex = 0;
-        virtualBottomIndex = myn * myn + 1;
+        virtualBottomIndex = (myn * myn) + 1;
         grid[virtualTopIndex] = true;
         grid[virtualBottomIndex] = false;
 
         // intialize union for percolation
         percUf = new WeightedQuickUnionUF(gridSize);
         // connect top and bottom rows to virtual sites
-        for (int col = 0; col <= myn; col ++) {
+        for (int col = 1; col <= myn; col ++) {
             // virtual top
-            int rowTop = 0;
+            int rowTop = 1;
             int topIndex = getIndex(rowTop, col);
             percUf.union(virtualTopIndex, topIndex);
 
@@ -48,7 +50,8 @@ public class Percolation {
 
     // given a row and column gets the index in the grid
     private int getIndex(int row, int col) {
-        return ((row - 1) * gridSize) + col;
+        checkRange(row, col);
+        return ((row - 1) * myn) + col;
     }
 
     //opens the site (row, col) if it is not open already
@@ -89,4 +92,44 @@ public class Percolation {
         int index = getIndex(row, col);
         return grid[index];
     }
+
+    // returns the nmber of open sites
+    public int numberOfOpenSites() {
+        return numOpenSites;
+    }
+
+    public boolean percolates() {
+        int findTop = percUf.find(virtualTopIndex);
+        int findBottom = percUf.find(virtualBottomIndex);
+
+        return findTop == findBottom;
+        
+    }
+
+    // check the row and column are in the valid range
+    public void checkRange(int row, int col) {
+        if (row > gridSize || row < 1) {
+            throw new IndexOutOfBoundsException("Row is out of bounds");
+        }
+        if (col > gridSize || col < 1) {
+            throw new IndexOutOfBoundsException("Column is out of bounds");
+        }
+    }
+
+    // testing
+    public static void main(String[] args) {
+        // create a 2 *2 grid to test
+        Percolation test = new Percolation(2);
+        test.open(1, 1);
+        test.open(1, 2);
+        test.open(2, 1);
+        test.open(2, 2);
+
+        if (test.percolates()) {
+            System.out.println("hey");
+        } else {
+            System.out.println("naw");
+        }
+    }
+    
 }
